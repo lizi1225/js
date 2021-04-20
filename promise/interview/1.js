@@ -1,6 +1,12 @@
+// const obj = {
+//     then(resolve) {
+//         return resolve(4)
+//     }
+// }
 Promise.resolve().then(() => {
     console.log(0)
     return Promise.resolve(4)
+    // return obj
 })
 .then(res => {
     console.log(res)
