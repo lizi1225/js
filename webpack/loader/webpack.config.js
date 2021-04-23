@@ -28,6 +28,7 @@ module.exports = {
           name: '[hash:8].[ext]',
           // esModule: false,
           limit: 8 * 1024,
+          fallback: path.resolve(__dirname, './loaders/file-loader.js')
         }
       }
     ]
