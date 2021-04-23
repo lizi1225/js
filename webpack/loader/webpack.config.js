@@ -12,6 +12,23 @@ module.exports = {
       {
         test: /\.js$/,
         use: ['babel-loader']
+      },
+      // {
+      //   test: /\.(png|jpg|gif|)$/,
+      //   loader: 'file-loader',
+      //   options: {
+      //     name: '[hash:8].[ext]',
+      //     esModule: false,
+      //   }
+      // },
+      {
+        test: /\.(png|jpg|gif|)$/,
+        loader: 'url-loader',
+        options: {
+          name: '[hash:8].[ext]',
+          // esModule: false,
+          limit: 8 * 1024,
+        }
       }
     ]
   },
