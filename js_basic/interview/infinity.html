@@ -1,0 +1,72 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+    .container {
+        width: 300px;
+        height: 200px;
+        border: 1px solid #efeff4;
+        background: #ffffff;
+        overflow: auto;
+    }
+
+    .card {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 150px;
+        background: #25bb9b;
+        margin: 10px;
+        color: #ffffff;
+        border-radius: 8px;
+    }
+</style>
+<body>
+<div class="container"></div>
+</body>
+<script>
+    new InfiniteScroll({
+        el: document.querySelector('.container'),
+        // 触发加载的距离底部的阈值，单位px
+        distance: 100,
+        call: (el, index) => {
+            let dom = document.createElement('div')
+            dom.className = 'card'
+            dom.innerText = index
+            el.appendChild(dom)
+        }
+    });
+
+    function InfiniteScroll(param) {
+        const that = this;
+        const container = param.el;
+        const distance = +param.distance || 0;
+        if (!container) return;
+        that.index = 0;
+        container.onscroll = () => {
+            _handleScroll(that, container, distance,param.call)
+        }
+        _handleScroll(that,container,distance,param.call)
+        _handleScroll(that,container,distance,param.call)
+    }
+
+
+    function _handleScroll(that,container, distance,call) {
+        const scrollTop = container.scrollTop;
+        const contentHeight = container.scrollHeight;
+        const height = container.clientHeight;
+        // const shouldTrigger = (contentHeight - scrollTop) > (height - distance);
+        console.log('scrollTop:', scrollTop,'scrollHeight:', contentHeight,'clientHeight:', height)
+        // const shouldTrigger = height - (scrollTop + contentHeight) <= distance
+        const shouldTrigger = contentHeight - height - scrollTop <= distance
+        if (!shouldTrigger) return;
+        // TODO: 请调用call回调，注意提供正确的参数
+        call(container,that.index++)
+        // _handleScroll.call(this, container, distance);
+    }
+</script>
+</html>
