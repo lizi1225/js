@@ -13,8 +13,17 @@ class HookCodeFactory {
         this.options = null
         this._args = null
     }
-    args() {
-        return this._args
+    args({
+        before,
+        after
+    }) {
+        let allArgs = this.options.args || [];
+        if (before) allArgs = [before, ...allArgs]
+        if (after) allArgs = [...allArgs, after]
+        if (allArgs.length > 0) {
+            return allArgs.join(', ')
+        }
+        return ""
     }
     header() {
         let code = ''
@@ -35,12 +44,51 @@ class HookCodeFactory {
                 )
 
                 break;
+            case 'async':
+                fn = new Function(
+                    this.args({
+                        after: '_callback'
+                    }),
+                    this.header() + this.content({
+                        onDone: () => "_callback()\n"
+                    })
+                )
+                break;
+            case 'promise':
+                fn = new Function(
+                    this.args({
+                        after: '_callback'
+                    }),
+                    this.header() + this.content({
+                        onDone: () => "_callback()\n"
+                    })
+                )
+                break;
 
             default:
                 break;
         }
         this.deinit()
         return fn
+    }
+    callTapsParallel({
+        onDone
+    }) {
+        let code = `var _counter = ${this.options.taps.length};\n`
+        if (onDone) {
+            code += `
+                var _done = function() {
+                    ${onDone()}
+                };\n
+            `
+        }
+        for (let i = 0; i < this.options.taps.length; i++) {
+            const done = () => 'if (--_counter === 0) _done();\n'
+            code += this.callTap(i, {
+                onDone: done
+            })
+        }
+        return code
     }
     callTapsSeries({
         onDone
@@ -63,7 +111,7 @@ class HookCodeFactory {
         onDone
     }) {
         let code = ''
-        code += `var _fn${tapIndex} = _x[${tapIndex}];`
+        code += `var _fn${tapIndex} = _x[${tapIndex}];\n`
         const tap = this.options.taps[tapIndex]
         switch (tap.type) {
             case 'sync':
@@ -72,7 +120,30 @@ class HookCodeFactory {
                     code += onDone()
                 }
                 break;
-
+            case 'async':
+                const cbCode = `
+                 function (_err${tapIndex}) {
+                     if (_err${tapIndex}) {
+                         _callback(_err${tapIndex})
+                     } else {
+                         ${onDone()}
+                     }
+                 }\n
+                `
+                code += `_fn${tapIndex}(${this.args({after:cbCode})});`
+                break;
+            case 'promise':
+                const cbCode = `
+                    function (_err${tapIndex}) {
+                        if (_err${tapIndex}) {
+                            _callback(_err${tapIndex})
+                        } else {
+                            ${onDone()}
+                        }
+                    }\n
+                `
+                code += `_fn${tapIndex}(${this.args({after:cbCode})});`
+                break;
             default:
                 break;
         }
