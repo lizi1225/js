@@ -13,10 +13,11 @@ class HookCodeFactory {
         this.options = null
         this._args = null
     }
-    args({
-        before,
-        after
-    }) {
+    args(options = {}) {
+        const {
+            before,
+            after
+        } = options
         let allArgs = this.options.args || [];
         if (before) allArgs = [before, ...allArgs]
         if (after) allArgs = [...allArgs, after]
@@ -28,6 +29,26 @@ class HookCodeFactory {
     header() {
         let code = ''
         code += 'var _x = this._x\n' // x是回调函数的数组
+        if (this.needContext()) {
+            code += `var _context = {};\n`
+        } else {
+            code += `var _context;\n`
+        }
+        let len = this.options.interceptors.length
+        if (len > 0) {
+            code += `
+                var _taps = this.taps;\n
+                var _interceptors = this.interceptors;\n
+            `
+        }
+        for (let i = 0; i < len; i++) {
+            const intercept = this.options.interceptors[i]
+            if (intercept.call) {
+                code += `_interceptors[${i}].call(${this.args({
+                    before: intercept.context ? '_context' : undefined
+                })});\n`
+            }
+        }
         return code
     }
     create(options) {
@@ -55,13 +76,19 @@ class HookCodeFactory {
                 )
                 break;
             case 'promise':
+                let content = this.content({
+                    onDone: () => `_resolve();`
+                })
+                content = `
+                    return new Promise(function (_resolve, _reject){
+                        ${content}
+                    });
+                `
                 fn = new Function(
                     this.args({
                         after: '_callback'
                     }),
-                    this.header() + this.content({
-                        onDone: () => "_callback()\n"
-                    })
+                    this.header() + content
                 )
                 break;
 
@@ -107,15 +134,30 @@ class HookCodeFactory {
         code += current()
         return code
     }
+    needContext() {
+        for (const tap of this.options.taps) {
+            if (tap.context) return true
+        }
+        return false
+    }
     callTap(tapIndex, {
         onDone
     }) {
         let code = ''
+        code += `var _tap${tapIndex} = _taps[${tapIndex}];`
+        for (let i = 0; i < this.options.interceptors.length; i++) {
+            const interceptor = this.options.interceptors[i]
+            if (interceptor.tap) {
+                code += `_interceptors[${i}].tap(${this.needContext() ? '_context,' : ''} _tap${tapIndex});\n`
+            }
+        }
         code += `var _fn${tapIndex} = _x[${tapIndex}];\n`
         const tap = this.options.taps[tapIndex]
         switch (tap.type) {
             case 'sync':
-                code += `_fn${tapIndex}(${this.args()});`
+                code += `_fn${tapIndex}(${this.args({
+                    before: this.needContext() ? '_context' : undefined
+                })});`
                 if (onDone) {
                     code += onDone()
                 }
@@ -133,16 +175,15 @@ class HookCodeFactory {
                 code += `_fn${tapIndex}(${this.args({after:cbCode})});`
                 break;
             case 'promise':
-                const cbCode = `
-                    function (_err${tapIndex}) {
-                        if (_err${tapIndex}) {
-                            _callback(_err${tapIndex})
-                        } else {
-                            ${onDone()}
-                        }
-                    }\n
+                code = `
+                 var _fn${tapIndex} = _x[${tapIndex}];
+                 var _promise${tapIndex} = _fn${tapIndex}(${this.args()});
+                 _promise${tapIndex}.then(
+                     function () {
+                         ${onDone()}
+                     }
+                 );
                 `
-                code += `_fn${tapIndex}(${this.args({after:cbCode})});`
                 break;
             default:
                 break;

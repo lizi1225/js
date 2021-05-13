@@ -1,1 +1,2 @@
-console.log('index')
+const $ = require('jquery')
+console.log($)

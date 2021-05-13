@@ -3,6 +3,7 @@ class Hook {
         if (!Array.isArray(args)) args = []
         this._args = args
         this.taps = []
+        this.interceptors = []
         this._call = CALL_DELEGATE
         this.call = CALL_DELEGATE
         this.callAsync = CALL_ASYNC_DELEGATE
@@ -21,11 +22,28 @@ class Hook {
         if (typeof options === 'string') options = {
             name: options
         }
-        this._insert({
+        let tapInfo = {
             ...options,
             type,
             fn
-        })
+        }
+        tapInfo = this._runRegisterInterceptors(tapInfo)
+
+        this._insert(tapInfo)
+    }
+    _runRegisterInterceptors(tapInfo) {
+        for (const interceptor of this.interceptors) {
+            if (interceptor.register) {
+                let newTapInfo = interceptor.register(tapInfo)
+                if (newTapInfo !== undefined) {
+                    tapInfo = newTapInfo
+                }
+            }
+        }
+        return tapInfo
+    }
+    intercept(interceptor) {
+        this.interceptors.push(interceptor)
     }
     compile() {
         throw new Error('Abstract: should be overridden')
@@ -43,6 +61,7 @@ class Hook {
         return this.compile({
             taps: this.taps,
             args: this._args,
+            interceptors: this.interceptors,
             type
         })
     }
