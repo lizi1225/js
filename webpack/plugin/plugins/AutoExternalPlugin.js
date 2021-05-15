@@ -1,3 +1,7 @@
+const {
+    ExternalModule
+} = require("webpack")
+
 class AutoExternalPlugin {
     constructor(options) {
         this.options = options
@@ -5,7 +9,27 @@ class AutoExternalPlugin {
     }
     apply(compiler) {
         compiler.hooks.normalModuleFactory.tap('AutoExternalPlugin', (normalModuleFactory) => {
+            normalModuleFactory.hooks.parser
+                .for('javascript/auto')
+                .tap('AutoExternalPlugin', parser => {
+                    parser.hooks.import.tap('AutoExternalPlugin', (statement, source) => {
+                        this.importedModules.add(source)
+                    })
+                    parser.hooks.call.for('require').tap('AutoExternalPlugin', (expression) => {
+                        let value = expression.arguments[0].value
+                        this.importedModules.add(value)
+                    })
+                })
+            normalModuleFactory.hooks.factorize.tapAsync('AutoExternalPlugin', (resolvedData, callback) => {
+                const request = resolvedData.request // ./src/index.js
+                if (this.importedModules.has(request)) {
+                    let variable = this.options[request].expose
+                    callback(null, new ExternalModule(variable, 'window', request))
+                } else {
+                    callback(null, new ExternalModule('jquery', 'window', request))
 
+                }
+            })
         })
     }
 }

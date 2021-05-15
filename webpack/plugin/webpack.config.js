@@ -6,6 +6,7 @@ const AutoExternalPlugin = require('./plugins/AutoExternalPlugin')
 module.exports = {
     mode: 'development',
     devtool: false,
+    entry: './src/index.js',
     // externals: {
     //     'jquery': '$'
     // },
@@ -14,10 +15,10 @@ module.exports = {
         // new AssetsPlugin(),
         // new ZipPlugin(),
 
-        new HtmlWebpackPlugin({
-            template: './src/index.html',
-            filename: 'index.html'
-        }),
+        // new HtmlWebpackPlugin({
+        //     template: './src/index.html',
+        //     filename: 'index.html'
+        // }),
         new AutoExternalPlugin({
             jquery: {
                 expose: '$',

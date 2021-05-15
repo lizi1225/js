@@ -1,14 +1,14 @@
 /******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "jquery":
-/*!********************!*\
-  !*** external "$" ***!
-  \********************/
+/***/ "./src/index.js":
+/*!*************************!*\
+  !*** external "jquery" ***!
+  \*************************/
 /***/ ((module) => {
 
-"use strict";
-module.exports = $;
+module.exports = window["jquery"];
 
 /***/ })
 
@@ -39,15 +39,11 @@ module.exports = $;
 /******/ 	}
 /******/ 	
 /************************************************************************/
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
-(() => {
-/*!**********************!*\
-  !*** ./src/index.js ***!
-  \**********************/
-const $ = __webpack_require__(/*! jquery */ "jquery")
-console.log($)
-})();
-
+/******/ 	
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	// This entry module used 'module' so it can't be inlined
+/******/ 	var __webpack_exports__ = __webpack_require__("./src/index.js");
+/******/ 	
 /******/ })()
 ;
