@@ -4,6 +4,7 @@ const {
     AsyncParallelHook,
     SyncHook
 } = require('tapable')
+const Stats = require('./Stats')
 const Compilation = require('./Compilation')
 const NormalModuleFactory = require('./NormalModuleFactory')
 
@@ -29,16 +30,11 @@ class Compiler {
         console.log('compiler run')
         // 编译完成后最终的回调
         const finalCallback = (err, stats) => {
-            callback()
+            callback(err, stats)
         }
         const onCompiled = (err, compilation) => {
             console.log('onCompiled')
-            finalCallback(err, {
-                entries: [],
-                chunks: [],
-                module: [],
-                assets: [],
-            })
+            finalCallback(err, new Stats(compilation))
         }
         this.hooks.beforeRun.callAsync(this, err => {
             this.hooks.run.callAsync(this, err => {
@@ -53,7 +49,7 @@ class Compiler {
             const compilation = this.newCompilation(params)
             this.hooks.make.callAsync(compilation, err => {
                 console.log('make完成')
-                onCompiled()
+                onCompiled(err, compilation)
             })
         })
     }

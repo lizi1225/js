@@ -8,7 +8,7 @@ module.exports = class SingleEntryPlugin {
         compiler.hooks.make.tapAsync('SingEntryPlugin', (compilation, callback) => {
             const {context, entry, name} = this
             console.log('SingEntryPlugin make')
-            //compilation.addEntry(context, entry, name, callback)
+            compilation.addEntry(context, entry, name, callback)
         })
     }
 }
