@@ -2,10 +2,10 @@ const path = require('path')
 const types = require('babel-types')
 const generate = require('babel-generator').default
 const traverse = require('babel-traverse').default
-const { moduleId } = require('_webpack@5.37.0@webpack/lib/RuntimeGlobals')
+const async = require('neo-async')
 
 module.exports = class NormalModule {
-    constructor({ name, context, rawRequest, resource, parser, moduleId }) {
+    constructor({ name, context, rawRequest, resource, parser, moduleId, async }) {
         this.name = name
         this.context = context
         this.rawRequest = rawRequest
@@ -17,6 +17,10 @@ module.exports = class NormalModule {
         this._source = undefined
         this._ast = undefined
         this.dependencies = []
+        // 当前模块依赖哪些异步模块 动态import
+        this.blocks = []
+        // 当前代码块是异步还是同步
+        this.async = async
     }
     build(compilation, callback) {
         this.doBuild(compilation, (err) => {
@@ -27,26 +31,59 @@ module.exports = class NormalModule {
                     if(node.callee.name === 'require') {
                         node.callee.name = '__webpack_require__'
                         const moduleName = node.arguments[0].value
-                        const extName = moduleName.split(path.posix.sep).pop().indexOf('.') === -1 ? '.js' : ''
-                        // 获取依赖模块的绝对路径
-                        // path.posix路径分隔符一定是linux下的/ 保证打包出来的代码路径一样
-                        const depResource = path.posix.join(path.posix.dirname(this.resource), moduleName + extName)
-                        const depModuleId = './' + path.posix.relative(this.context, depResource)
+                        let depResource;
+                        // 判断是第三方模块还是本地模块(未考虑别名的情况)
+                        if (moduleName.startsWith('.')) {
+                            const extName = moduleName.split(path.posix.sep).pop().indexOf('.') === -1 ? '.js' : ''
+                            // 获取依赖模块的绝对路径
+                            // path.posix路径分隔符一定是linux下的/ 保证打包出来的代码路径一样
+                            depResource = path.posix.join(path.posix.dirname(this.resource), moduleName + extName)
+                            
+                        } else {
+                            depResource = require.resolve(path.posix.join(this.context, 'node_modules', moduleName))
+                            // 把window路径分隔符转为/
+                            depResource = depResource.replace(/\\/g, '/')
+                        }
+                        // const depModuleId = './' + path.posix.relative(this.context, depResource)
+                        let depModuleId = '.' + depResource.slice(this.context.length)
                         // 把require的模块id 从./title.js改成了./src/title.js
                         node.arguments = [types.stringLiteral(depModuleId)]
                         this.dependencies.push({
                             name: this.name,
                             context: this.context,
-                            rawRequest: moduleName + extName,
+                            rawRequest: moduleName,
                             moduleId: depModuleId,
                             resource: depResource,
+                        })
+                    } else if(types.isImport(node.callee)) {
+                        const moduleName = node.arguments[0].value
+                        const extName = moduleName.split(path.posix.sep).pop().indexOf('.') === -1 ? '.js' : ''
+                        const depResource = path.posix.join(path.posix.dirname(this.resource), moduleName + extName)
+                        const depModuleId = './' + path.posix.relative(this.context, depResource)
+                        let chunkName = 0
+                        if (Array.isArray(node.arguments[0].leadingComments) && node.arguments[0].leadingComments.length > 0) {
+                            const leadingComments = node.arguments[0].leadingComments[0].value
+                            const regexp = /webpackChunkName:\s*['"]([^'"]+)['"]/
+                            chunkName = leadingComments.match(regexp)[1]
+                        }
+                        nodePath.replaceWithSourceString(`
+                            __webpack_require__.e("${chunkName}").then(__webpack_require__.t.bind(null, "${depModuleId}"), 7)
+                        `)
+                        this.blocks.push({
+                            context: this.context,
+                            entry: depModuleId,
+                            name: chunkName,
+                            async: true
                         })
                     }
                 }
             })
             const { code } = generate(this._ast)
             this._source = code
-            callback()
+            // 循环构建每一个异步代码块
+            async.forEach(this.blocks, ({ context, entry, name, async }, done) => {
+                compilation._addModuleChain(context, entry, name, async, done)
+            }, callback)
         })
     }
     /**
@@ -78,4 +115,10 @@ module.exports = class NormalModule {
  * ./src/index.js
  * ./node_modules/util/util.js
  * 特点： 以.开头 路径分割符是linux的/ 
+ */
+
+/**
+ * 如何处理懒加载
+ * 1. 先把代码转成ast语法树
+ * 2.
  */
