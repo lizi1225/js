@@ -1,7 +1,10 @@
 var VueReactivity = (function (exports) {
 	'use strict';
 
+	const VueShared = 'VueShared';
+
 	const VueReactivity = 'VueReactivity';
+	console.log(VueShared);
 
 	exports.VueReactivity = VueReactivity;
 
@@ -10,3 +13,4 @@ var VueReactivity = (function (exports) {
 	return exports;
 
 }({}));
+//# sourceMappingURL=reactivity.global.js.map
