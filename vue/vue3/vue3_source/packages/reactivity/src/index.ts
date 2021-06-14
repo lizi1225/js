@@ -1,3 +1,1 @@
-import { VueShared } from '@vue/shared'
-export const VueReactivity = 'VueReactivity'
-console.log(VueShared)
+export { reactive, shallowReactive, readonly, shallowReadonly } from './reactive'

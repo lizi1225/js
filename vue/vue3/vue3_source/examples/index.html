@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script src="../node_modules/@vue/reactivity/dist/reactivity.global.js"></script>
+    <script>
+        const {reactive,readonly, shallowReadonly, shallowReactive} = VueReactivity
+        const obj = {name: 'zf', age: 12, address: {num: 504}}
+        const r1 = readonly(obj)
+        // const r2 = readonly(obj)
+        // const r3 = shallowReadonly(obj)
+        // const r4 = shallowReactive(obj)
+        // console.log(r1.address, r2.address, r3.address, r4.address)
+        r1.address.num = 'ww'
+    </script>
+</body>
+</html>
