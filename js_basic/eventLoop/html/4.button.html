@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button id="button">按钮</button>
+    <script>
+        const click1 = () => {
+            Promise.resolve().then(() => console.log('Micro task 1')); // M1
+            console.log('Listener 1');//此时堆栈清空 // L1
+        }
+        button.addEventListener('click', click1);
+        const click2 = () => {
+            Promise.resolve().then(() => console.log('Micro task 2')); // M2
+            console.log('Listener 2'); // L2
+        }
+        button.addEventListener('click', click2);
+        // Listener1 Micro task 1 Listener 2 Micro task 2
+         button.click(); //堆栈在执行完Listener1后没有清空。还在Script中
+    </script>
+</body>
+</html>

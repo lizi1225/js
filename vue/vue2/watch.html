@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        {{a}}
+    </div>
+    <script src="dist/umd/vue.js"></script>
+    <script>
+        const vm = new Vue({
+            el: '#app',
+            data: {a:{a:{a:1}}},
+            watch: {
+                'a.a.a': {
+                    handler(newVal, oldVal) {
+                        console.log(newVal, oldVal)
+                    },
+                    deep: true,
+                }
+            }
+        })
+        vm.a.a.a =  100
+        setTimeout(() => {
+            vm.a.a.a = 1000
+        })
+    </script>
+</body>
+</html>

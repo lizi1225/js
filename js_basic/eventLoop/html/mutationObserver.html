@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="tree"></div>
+    <button onclick="start()">开始监听</button>
+    <button onclick="changeAttribute()">修改属性</button>
+    <button onclick="addChild()">添加子节点，3秒后删除</button>
+    <script>
+        const targetNode = document.getElementById('tree')
+        const config = {attributes: true, childList: tree, subtree: true}
+        const callback = function(mutationList) {
+            for (let mutation of mutationList) {
+                if (mutation.type === 'childList') {
+                    console.log('一个子节点创建或被删除了')
+                } else if (mutation.type === 'attributes') {
+                    console.log('属性' + mutation.attributeName + '被改变了')
+                }
+            }
+        }
+        const observer = new MutationObserver(callback)
+        function start() {
+            observer.observe(targetNode, config)
+        }
+        function changeAttribute() {
+            targetNode.setAttribute('data-name', '树')
+        }
+        function addChild() {
+            let child = document.createElement('div')
+            child.innerHTML = '子节点'
+            targetNode.appendChild(child)
+            setTimeout(() => {
+                targetNode.removeChild(child)
+            }, 3000)
+        }
+    </script>
+</body>
+</html>

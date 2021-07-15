@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <a id="link" href="http://www.baidu.com">link</a>
+    <script>
+        let link = document.getElementById('link');
+        const nextTick = new Promise(resolve => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault()
+                resolve(e)
+            }, { once: true });
+        });
+        nextTick.then(event => {
+            event.preventDefault();
+            console.log('event.preventDefault()');
+        });
+        link.click();
+
+        // console.time('time')
+        // setTimeout(()=> {
+        //     console.timeEnd('time')
+        // })
+        // setTimeout(() => {
+        //     setTimeout(() => {
+        //         setTimeout(() => {
+        //                 console.time('time')
+        //                 setTimeout(() => {
+        //                     console.timeEnd('time')
+        //         }, 0)
+        //         }, 0)
+        //         }, 0)
+        // }, 0)
+
+    </script>
+</body>
+</html>

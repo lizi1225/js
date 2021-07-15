@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app" style="width: 500px;margin: 0 auto;">
+        <textarea style="width: 500px;height: 500px;" v-model="content"></textarea>
+        <button @click="run">运行组件</button>
+    </div>
+
+    <div id="run-result"></div>
+    <script src="./node_modules/vue/dist/vue.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                content: ''
+            },
+            methods: {
+                run() {
+                    // 弹框组件 手动挂载到某个地方
+                //    const ChildComponent =  Vue.extend({
+                //         template: '<div>hello {{msg}}</div>',
+                //         data() {
+                //             return {msg: 'zs'}
+                //         }
+                //     })
+                //     new ChildComponent().$mount('#run-result')
+                    const content = this.content
+                    
+                    const template = this.getSource('template')
+                    const script = this.getSource('script').replace(/export default/, 'return')
+                    const obj = new Function(script)()
+                    const style = this.getSource('style')
+                    
+                    obj.template = template
+
+                    const ChildComponent = Vue.extend(obj)
+                    const styleEle = document.createElement('style')
+                    styleEle.innerHTML = style
+                    document.body.appendChild(styleEle)
+                    new ChildComponent().$mount('#run-result')
+
+                },
+                getSource(type) {
+                    const reg = new RegExp(`<${type}[^>]*>`)
+                    const content = this.content
+                    const matches = content.match(reg)
+                    if(matches) {
+                       const start = content.indexOf(matches[0]) + matches[0].length
+                       const end = content.lastIndexOf(`</${type}>`)
+                       return content.slice(start, end)
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+</html>
