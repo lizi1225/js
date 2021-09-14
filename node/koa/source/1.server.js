@@ -8,10 +8,10 @@ app.use((ctx) => {
     console.log(ctx.request.url)
     console.log(ctx.path)
 
-    ctx.body = 'a'
-    ctx.body = 'b'
-    ctx.response.body = 'c'
-    console.log(ctx.body)
+    // ctx.body = 'a'
+    // ctx.body = 'b'
+    // ctx.response.body = 'c'
+    // console.log(ctx.body)
 })
 
 app.listen(3000, () => {

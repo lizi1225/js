@@ -2,16 +2,18 @@ const http = require('http')
 const context = require('./context')
 const request = require('./request')
 const response = require('./response')
+const EventEmitter = require('events')
 
-class Application {
+class Application extends EventEmitter {
     constructor() {
+        super()
         this.context = Object.create(context)
         this.request = Object.create(request)
         this.response = Object.create(response)
-        this.pendingList = []
+        this.middleWares = []
     }
-    use(fn) {
-        this.pendingList.push(fn)
+    use(middleWare) {
+        this.middleWares.push(middleWare)
     }
     createContext(req, res) {
         const ctx = Object.create(this.context)
@@ -21,16 +23,45 @@ class Application {
         ctx.req = ctx.request.req = req
 
         ctx.response = response
-        ctx.res = ctx.request.res = res
+        ctx.res = ctx.response.res = res
         
 
         return ctx
     }
+    compose(ctx) {
+        let index = -1
+        const dispatch = (i) => {
+            if (index >= i) {
+                return Promise.reject('Error: next() called multiple times')
+            }
+            if (this.middleWares.length === i) {
+                return Promise.resolve()
+            }
+            index = i
+            try {
+                return Promise.resolve(this.middleWares[i](ctx, () => dispatch(i + 1)))
+            } catch (error) {
+                return Promise.reject(error)
+            }
+        }
+        return dispatch(0)
+    }
     handleRequest = (req, res) => {
         const ctx = this.createContext(req, res)
-        this.pendingList.forEach((fn) => fn(ctx))
-
-        res.end(ctx.body)
+        res.statusCode = 404
+        
+        this.compose(ctx).then(() => {
+            const body = ctx.body
+            if (body) {
+                res.end(ctx.body)
+            }else {
+                res.end('Not Found')
+            }
+        }).catch((e) => {
+            this.emit('error', e)
+        })
+        
+        
     }
     listen() {
         const server = http.createServer(this.handleRequest)
