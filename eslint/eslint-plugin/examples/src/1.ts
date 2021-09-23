@@ -1,3 +1,20 @@
-const a = 1
+// let a,b,c
+// c = 2
+
+// let d,e,f
+// e =3
+enum Color  {
+  Red,
+  Green,
+  Blue
+}
+
+
+// export {
+//   a
+// }
 // console.log(a)
-export var b = 2
+// 
+// export const a = function() {
+//   console.log('a')
+// }

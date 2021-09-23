@@ -18,7 +18,8 @@ module.exports = {
   },
   "plugins": [
       "@typescript-eslint",
-      "deadvars"
+      "deadvars",
+      "autofix",
       // 'tree-eslint',
       // 'autofix',
   ],
@@ -29,5 +30,7 @@ module.exports = {
       '@typescript-eslint/no-var-requires': 0,
       // 'tree-eslint/no-console-log': ['error', ['info']],
       'deadvars/dead-vars': 2,
+      "autofix/no-debugger": "error",
+      "autofix/no-unused-vars": "error",
   },
 };

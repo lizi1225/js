@@ -1,0 +1,31 @@
+#! /usr/bin/env node
+const { program } = require('commander');
+const pkg = require('../package.json');
+const config = require('./config');
+const chalk = require('chalk')
+const { start } = require('../src')
+
+
+const usages = []
+Object.values(config).forEach(option=>{
+    program.option(option.flags,option.description,option.default);
+    usages.push(option.usage);
+})
+program.name('zs')
+program.usage('[options]')
+program.version(pkg.version)
+
+program.on('--help',function () {
+    console.log('\r\nExamples:');
+    usages.forEach(usage=>{
+        console.log(`  ${usage}`)
+    })
+
+})
+program.parse(process.argv); // 解析用户的所有参数
+const params = program.opts()
+if (!params.path) {
+  console.error(chalk.red('Error: must need a tsconfig path'))
+  return
+}
+start(params)
