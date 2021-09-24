@@ -6,11 +6,10 @@ const chalk = require('chalk')
 const { start } = require('../src')
 
 
-const usages = []
-Object.values(config).forEach(option=>{
+ const usages = Object.values(config).reduce((prev, option)=>{
     program.option(option.flags,option.description,option.default);
-    usages.push(option.usage);
-})
+    return prev.concat(option.usage)
+}, [])
 program.name('zs')
 program.usage('[options]')
 program.version(pkg.version)
