@@ -1,8 +1,11 @@
 const chalk = require('chalk');
-const { unlink, readdir, rmdir } = require('fs').promises
+const { unlink, readdir, rmdir, stat } = require('fs').promises
 const path = require('path')
 
 const { workDir, whiteList, ignoreFiles } = require('./config')
+
+// 收集删除文件和目录
+const delFiles = new Set(), delDirs = new Set()
 
 function getUnUsedFiles({ allFiles, importFiles }) {
   const usedFileObj = importFiles.reduce((prev, current) => {
@@ -24,15 +27,32 @@ function getUnUsedFiles({ allFiles, importFiles }) {
     .map((filePath) => path.relative(workDir, filePath));
 }
 
-function delUnusedFiles(targets = []) {
-  targets.forEach((filePath) => {
-    unlink(filePath)
+function delUnusedFiles(targets = [], isDelEmptyDirectory) {
+  Promise.all(targets.map((filePath) => {
+    return unlink(filePath)
     .then(() => {
-      return delDir(path.join(filePath, '../'))
+      delFiles.add(filePath)
+      return !isDelEmptyDirectory ? Promise.resolve() : delDir(path.join(filePath, '../'))
     })
-    .catch((err) => {
-      console.log(chalk.red(err))
-    })
+  }))
+  .catch((err) => {
+    console.log(chalk.red(err))
+  })
+  .finally(() => {
+    if (delFiles.size) {
+      console.log(chalk.red('==================================The following files were successfully deleted=================================='));
+      [...delFiles].forEach((delFiles) => {
+        console.log(chalk.green(delFiles))
+      })
+    }
+
+    if (delDirs.size) {
+      console.log(chalk.red('=================================The following directories were successfully deleted=================================='));
+      [...delDirs].forEach((delDir) => {
+        console.log(chalk.green(delDir))
+      })
+    }
+    
   })
 }
 
@@ -43,9 +63,13 @@ function delDir(dirPath) {
   return readdir(dirPath)
   .then((files) => {
     if (files.length === 0) {
-      rmdir(dirPath)
-      return delDir(path.resolve(dirPath, '../'))
+      return stat(dirPath).then(() => rmdir(dirPath).then(() => {
+        delDirs.add(path.relative(workDir, dirPath))
+      }))
     }
+  })
+  .then(() => {
+    return delDir(path.resolve(dirPath, '../'))
   })
 }
 

@@ -11,7 +11,7 @@ const { getUnUsedFiles, delUnusedFiles } = require('./unusedFiles')
 
 
 const start = (params) => {
-  const { path:p, fix, del } = params
+  const { path:p, fix, del, delEmptyDirectory } = params
   const { config: { include } } = parseTsConfig(p)
   addWhiteList(include, whiteList)
   const analyzeTsParams = {
@@ -42,7 +42,7 @@ const start = (params) => {
   })
   createCli({ filenameArr, fix, include })
 
-  del && delUnusedFiles(unUsedFiles)
+  del && delUnusedFiles(unUsedFiles, delEmptyDirectory)
 }
 
 

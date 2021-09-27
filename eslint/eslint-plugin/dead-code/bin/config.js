@@ -23,4 +23,11 @@ module.exports = {
     default: false,
     usage:"dc --del"
   },
+  // 是否删除因删除未使用的文件产生的空文件夹
+  "delEmptyDirectory": {
+    flags: "-ded, --delEmptyDirectory",
+    description: "delete all empty directories from delete unused files",
+    default: false,
+    usage:"dc --delEmptyDirectory"
+  },
 }
