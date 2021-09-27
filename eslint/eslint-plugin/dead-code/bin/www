@@ -7,7 +7,7 @@ const { start } = require('../src')
 
 
  const usages = Object.values(config).reduce((prev, option)=>{
-    program.option(option.flags,option.description,option.default);
+    program.option(option.flags, option.description, option.default);
     return prev.concat(option.usage)
 }, [])
 program.name('zs')

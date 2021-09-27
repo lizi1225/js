@@ -18,3 +18,4 @@ enum Color  {
 // export const a = function() {
 //   console.log('a')
 // }
+export const b = 'b'
