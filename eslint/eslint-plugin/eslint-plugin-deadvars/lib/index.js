@@ -1,4 +1,3 @@
-console.log(require('./rules/dead-vars').default)
 module.exports = {
     rules: {
       'dead-vars': require('./rules/dead-vars').default

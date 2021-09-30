@@ -313,7 +313,7 @@ const MERGABLE_TYPES = new Set([
     experimental_utils_1.AST_NODE_TYPES.TSTypeAliasDeclaration,
     experimental_utils_1.AST_NODE_TYPES.TSModuleDeclaration,
     experimental_utils_1.AST_NODE_TYPES.ClassDeclaration,
-    experimental_utils_1.AST_NODE_TYPES.FunctionDeclaration,
+    // experimental_utils_1.AST_NODE_TYPES.FunctionDeclaration,
 ]);
 /**
  * Determine if the variable is directly exported
