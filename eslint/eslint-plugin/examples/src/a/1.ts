@@ -12,31 +12,14 @@
 // export const b = function () {
 
 // }
-
-function aaaa1(   ) {
-  console.log('a')
-  return 1
-}
-
-function aaa2(x ) {
-  console.log(x)
-}
-
-function aaa3(  ) {
-  // console.log(z)
-}
-
-// const c = function () {
-
-// }
+const obj = {a:1, b:2}
+const {} = obj 
 // aaaa1();
-const a = 1, c= 3
-console.log(a,c)
-aaaa1()
-aaa2()
-aaa3()
+// aaaa1()
+// aaa2()
+// aaa3()
 
-
+// console.log(b)
 
 // export function e() {
 
