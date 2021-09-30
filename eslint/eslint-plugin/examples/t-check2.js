@@ -23,7 +23,7 @@ function getUnUsedFiles({ allFiles, importFiles }) {
     const imports = current.imports
     Object.keys(imports).forEach((path) => {
       const currentFile = importFiles.find((file) => file.path === path)
-      prev[currentFile.fullPath] = true
+      currentFile && (prev[currentFile.fullPath] = true)
     })
     return prev
   }, {})
@@ -56,10 +56,10 @@ const cli = new CLIEngine({
   plugins: ['@typescript-eslint', 'deadvars', 'autofix-fork'],
   envs: ['browser', 'es2021', 'node'],
   cwd: process.cwd(),
-  extensions: ['.ts'],
+  extensions: ['.ts', 'tsx'],
 })
 // console.log(cli.getRules().get('deadvars/dead-vars'))
-const report = cli.executeOnFiles(['src'])
+const report = cli.executeOnFiles([path.resolve(__dirname, 'src', 'a')])
 console.log(JSON.stringify(report, null, 2))
 // const formatter = cli.getFormatter();
 // // report.results = formatter(report.results)

@@ -1,0 +1,50 @@
+{
+  "name": "eslint-plugin-autofix-fork",
+  "version": "0.0.2",
+  "author": "lizi",
+  "description": "autofix some errors reported by eslint rules.",
+  "main": "./lib/index.js",
+  "scripts": {
+    "test": "mocha \"tests/**/*no-unused-vars.js\"",
+    "generate-readme-table": "node tools/generate-readme-table.js",
+    "generate-release": "node-release-script",
+    "new": "node tools/new-rule.js"
+  },
+  "files": [
+    "LICENSE",
+    "readme.md",
+    "lib"
+  ],
+  "dependencies": {
+    "eslint": "^7.32.0",
+    "eslint-plugin-deadvars": "^1.0.1",
+    "eslint-rule-composer": "^0.3.0",
+    "espree": "^7.3.1",
+    "esutils": "^2.0.2",
+    "lodash": "^4.17.20",
+    "string-similarity": "^4.0.3",
+    "typescript": "^4.4.3"
+  },
+  "devDependencies": {
+    "@not-an-aardvark/node-release-script": "^0.1.0",
+    "@types/eslint": "^7.2.6",
+    "execa": "^5.0.0",
+    "git-config": "0.0.7",
+    "husky": "^4.3.5",
+    "minimist": "^1.2.0",
+    "mocha": "^8.2.1"
+  },
+  "peerDependencies": {
+    "eslint": ">= 5.12.1"
+  },
+  "keywords": [
+    "eslint plugin",
+    "autofix"
+  ],
+  "license": "MIT",
+  "repository": "https://github.com/lizi1225/eslint-plugin",
+  "homepage": "https://github.com/lizi1225/eslint-plugin",
+  "engines": {
+    "node": ">=8"
+  }
+}

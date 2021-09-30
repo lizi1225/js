@@ -1,8 +1,7 @@
 const ts = require('typescript')
 const fs = require('fs')
-const path = require('path')
 
-const { workDir } = require('./config')
+
 
 function parseTsConfig(tsconfigPath) {
   try {
@@ -16,14 +15,8 @@ function parseTsConfig(tsconfigPath) {
   
 }
 
-function addWhiteList(entries = [], whiteList) {
-  whiteList.push(...entries.reduce((prev, cur) => {
-    prev.push(path.resolve(workDir, cur, 'index.ts'), path.resolve(workDir, cur, 'index.js'))
-    return prev
-  }, []))
-}
+
 
 module.exports = {
   parseTsConfig,
-  addWhiteList,
 }

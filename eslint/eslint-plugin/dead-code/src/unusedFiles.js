@@ -20,7 +20,7 @@ function getUnUsedFiles({ allFiles, importFiles }) {
     .map((absPath) => absPath.replace(/\//g, '\\'))
     .filter(
       (filePath) =>
-        !whiteList.includes(filePath) &&
+        !whiteList.value.includes(filePath) &&
         !usedFileObj[filePath] &&
         !new RegExp(ignoreFiles, 'u').test(filePath)
     )

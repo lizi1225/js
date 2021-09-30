@@ -4,7 +4,7 @@ const { omit, transform } = require('lodash')
 
 const { createCli } = require('./cli')
 const { whiteList, ignoreFiles } = require('./config')
-const { parseTsConfig, addWhiteList } = require('./util')
+const { parseTsConfig } = require('./util')
 const binConfig = require('../bin/config')
 const { getUnUsedFiles, delUnusedFiles } = require('./unusedFiles')
 
@@ -13,7 +13,7 @@ const { getUnUsedFiles, delUnusedFiles } = require('./unusedFiles')
 const start = (params) => {
   const { path:p, fix, del, delEmptyDirectory } = params
   const { config: { include } } = parseTsConfig(p)
-  addWhiteList(include, whiteList)
+  whiteList.add(include)
   const analyzeTsParams = {
     ignoreFiles,
     excludeDeclarationFiles: true,
