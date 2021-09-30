@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-autofix-fork",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "lizi",
   "description": "autofix some errors reported by eslint rules.",
   "main": "./lib/index.js",

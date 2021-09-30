@@ -102,7 +102,10 @@ module.exports = ruleComposer.mapReports(
 
                     // Don't autofix unused functions, it's likely a mistake
                     if (parent.id === node) {
-                        return null;
+                        if (grand && grand.type === 'ExportNamedDeclaration') {
+                            return fixer.remove(grand)
+                        }
+                        return fixer.remove(parent);
                     }
 
                     switch (config.args) {
@@ -133,12 +136,12 @@ module.exports = ruleComposer.mapReports(
 
                             const comma = sourceCode.getTokenBefore(node, commaFilter);
 
-                            if (comma && comma.range && grand.range && comma.range[0] >= grand.range[0]) {
+                            if (comma && comma.range && parent.range && comma.range[0] >= parent.range[0]) {
                                 return [fixer.remove(comma), fixer.remove(node)];
                             }
                             const commaAfter = sourceCode.getTokenAfter(node, commaFilter);
 
-                            if (commaAfter && commaAfter.range && grand.range && commaAfter.range[1] <= grand.range[1]) {
+                            if (commaAfter && commaAfter.range && parent.range && commaAfter.range[1] <= parent.range[1]) {
                                 return [fixer.remove(node), fixer.remove(commaAfter)];
                             }
 
@@ -179,6 +182,13 @@ module.exports = ruleComposer.mapReports(
                 case "VariableDeclarator":
                     if (!grand) {
                         return null;
+                    }
+
+                    if (parent.init && ['FunctionExpression', 'ArrowFunctionExpression'].includes(parent.init.type)) {
+                        if (grand.parent && grand.parent.type === 'ExportNamedDeclaration') {
+                            return fixer.remove(grand.parent)
+                        }
+                        return fixer.remove(grand);
                     }
 
                     if (parent.init && hasSideEffect(parent.init)) {
