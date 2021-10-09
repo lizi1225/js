@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-autofix-fork",
-  "version": "0.0.3",
+  "version": "0.0.48",
   "author": "lizi",
   "description": "autofix some errors reported by eslint rules.",
   "main": "./lib/index.js",
@@ -17,7 +17,7 @@
   ],
   "dependencies": {
     "eslint": "^7.32.0",
-    "eslint-plugin-deadvars": "^1.0.1",
+    "eslint-plugin-deadvars": "^1.0.31",
     "eslint-rule-composer": "^0.3.0",
     "espree": "^7.3.1",
     "esutils": "^2.0.2",

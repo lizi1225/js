@@ -100,7 +100,6 @@ module.exports = ruleComposer.mapReports(
                 case "FunctionDeclaration":
                 case "ArrowFunctionExpression":
 
-                    // Don't autofix unused functions, it's likely a mistake
                     if (parent.id === node) {
                         if (grand && grand.type === 'ExportNamedDeclaration') {
                             return fixer.remove(grand)
@@ -139,11 +138,14 @@ module.exports = ruleComposer.mapReports(
                             if (comma && comma.range && parent.range && comma.range[0] >= parent.range[0]) {
                                 return [fixer.remove(comma), fixer.remove(node)];
                             }
-                            const commaAfter = sourceCode.getTokenAfter(node, commaFilter);
+                            if (parent.params.length > 1) {
+                                const commaAfter = sourceCode.getTokenAfter(node, commaFilter);
 
-                            if (commaAfter && commaAfter.range && parent.range && commaAfter.range[1] <= parent.range[1]) {
-                                return [fixer.remove(node), fixer.remove(commaAfter)];
+                                if (commaAfter && commaAfter.range && parent.range && commaAfter.range[1] <= parent.range[1]) {
+                                    return [fixer.remove(node), fixer.remove(commaAfter)];
+                                }
                             }
+                            
 
                             return [fixer.remove(node)];
                         }
@@ -220,17 +222,29 @@ module.exports = ruleComposer.mapReports(
                     return fixer.remove(parent);
                 case "RestElement":
                 case "Property":
-
+                    if (parent.type === 'RestElement' && grand.type === 'FunctionDeclaration') {
+                        if (grand.params.length === 1) {
+                            return fixer.remove(parent)
+                        }
+                        return [
+                            fixer.remove(sourceCode.getTokenBefore(parent, commaFilter)),
+                            fixer.remove(parent),
+                        ];
+                    }
                     // https://github.com/aladdin-add/eslint-plugin-autofix/issues/48
                     if (!(grand && grand.type === "ObjectPattern")) {
                         return null;
                     }
 
                     if (grand.properties.length === 1) {
-                        const identifierRemoval = fixer.remove(parent);
-                        const comma = sourceCode.getLastToken(grand, commaFilter);
+                        // const identifierRemoval = fixer.remove(parent);
+                        // const comma = sourceCode.getLastToken(grand, commaFilter);
 
-                        return comma ? [identifierRemoval, fixer.remove(comma)] : identifierRemoval;
+                        // return comma ? [identifierRemoval, fixer.remove(comma)] : identifierRemoval;
+                        if (grand.parent.type === 'VariableDeclarator') {
+                            return fixer.remove(grand.parent.parent)
+                        }
+                        return fixer.remove(grand)
                     }
 
                     if (parent === grand.properties[grand.properties.length - 1]) {
@@ -245,8 +259,12 @@ module.exports = ruleComposer.mapReports(
                     ];
                 case "ArrayPattern":
                     return fixer.remove(node);
-                // delete unused TSEnumDeclaration
                 case "TSEnumDeclaration":
+                case "TSTypeAliasDeclaration":
+                case "TSInterfaceDeclaration":
+                    if (grand && grand.type === 'ExportNamedDeclaration') {
+                        return fixer.remove(grand)
+                    }
                     return fixer.remove(parent);
                 default:
                     return null;

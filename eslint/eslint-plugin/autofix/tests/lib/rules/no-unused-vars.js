@@ -191,16 +191,40 @@ ruleTester.run("no-unused-vars", rule, {
         },
         {
             code: "let {...a} = b",
-            output: "let {} = b",
+            output: "",
             parserOptions: { ecmaVersion: 2018 },
             errors: [{ type: "Identifier" }]
         },
         {
             code: "function foo(...args){}",
-            output: null,
+            output: "",
             parserOptions: { ecmaVersion: 2018 },
             errors: [{ type: "Identifier" }, { type: "Identifier" }]
         },
+        {
+            code: "function foo(...args){}; foo();",
+            output: "function foo(){}; foo();",
+            parserOptions: { ecmaVersion: 2018 },
+            errors: [{ type: "Identifier" }]
+        },
+        {
+            code: "function foo(a, ...args){console.log(a);}; foo();",
+            output: "function foo(a ){console.log(a);}; foo();",
+            parserOptions: { ecmaVersion: 2018 },
+            errors: [{ type: "Identifier" }]
+        },
+        {
+            code: "function foo({ a }){}; foo();",
+            output: "function foo(){}; foo();",
+            parserOptions: { ecmaVersion: 2018 },
+            errors: [{ type: "Identifier" }]
+        },
+        // {
+        //     code: "function foo(a1, a2 = {}){console.log(a1)}; foo();", 
+        //     output: "function foo(a1 ){console.log(a1)}; foo();",
+        //     parserOptions: { ecmaVersion: 2018 },
+        //     errors: [{ type: "Identifier" }]
+        // },
         {
             code: "function foo(a, b, c){console.log(b);}; foo(1, 2, 3);",
             output: "function foo(a, b ){console.log(b);}; foo(1, 2, 3);",
@@ -301,19 +325,19 @@ ruleTester.run("no-unused-vars", rule, {
         },
         {
             code: "let {a} = b",
-            output: "let {} = b",
+            output: "",
             parserOptions: { ecmaVersion: 6 },
             errors: [{ type: "Identifier" }]
         },
         {
             code: "let {a,} = b",
-            output: "let {} = b",
+            output: "",
             parserOptions: { ecmaVersion: 6 },
             errors: [{ type: "Identifier" }]
         },
         {
             code: "let {a1: a2} = b",
-            output: "let {} = b",
+            output: "",
             parserOptions: { ecmaVersion: 6 },
             errors: [{ type: "Identifier" }]
         },
