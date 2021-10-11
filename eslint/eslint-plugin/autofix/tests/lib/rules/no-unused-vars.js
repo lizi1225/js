@@ -190,8 +190,18 @@ ruleTester.run("no-unused-vars", rule, {
             errors: [{ type: "Identifier" }]
         },
         {
+            code: "var {a = 'c', b} = c; b;",
+            output: "var { b} = c; b;",
+            errors: [{ type: "Identifier" }]
+        },
+        {
+            code: "var {a = 'c', b} = c;",
+            output: "var { b} = c;",
+            errors: [{ type: "Identifier" }, { type: "Identifier" }]
+        },
+        {
             code: "let {...a} = b",
-            output: "",
+            output: "let {} = b",
             parserOptions: { ecmaVersion: 2018 },
             errors: [{ type: "Identifier" }]
         },
@@ -286,6 +296,55 @@ ruleTester.run("no-unused-vars", rule, {
             }]
         },
         {
+            code: "const foo = test(a => {}); foo();",
+            output: "const foo = test(() => {}); foo();",
+            parserOptions: { ecmaVersion: 2018 },
+            errors: [
+                { type: "Identifier" }
+            ],
+            options: [{
+                args: "after-used",
+                argsIgnorePattern: "^_"
+            }]
+        },
+        {
+            code: "const foo = ({a}) => {}; foo();",
+            output: "const foo = () => {}; foo();",
+            parserOptions: { ecmaVersion: 2018 },
+            errors: [
+                { type: "Identifier" }
+            ],
+            options: [{
+                args: "after-used",
+                argsIgnorePattern: "^_"
+            }]
+        },
+        {
+            code: "const foo = ({a}, b) => {}; foo();",
+            output: "const foo = ({} ) => {}; foo();",
+            parserOptions: { ecmaVersion: 2018 },
+            errors: [
+                { type: "Identifier" },
+                { type: "Identifier" },
+            ],
+            options: [{
+                args: "after-used",
+                argsIgnorePattern: "^_"
+            }]
+        },
+        {
+            code: "const foo = (a, {b}) => {console.log(a)}; foo();",
+            output: "const foo = (a ) => {console.log(a)}; foo();",
+            parserOptions: { ecmaVersion: 2018 },
+            errors: [
+                { type: "Identifier" },
+            ],
+            options: [{
+                args: "after-used",
+                argsIgnorePattern: "^_"
+            }]
+        },
+        {
             code: "function foo(a, b, c){console.log(b);}; foo(1, 2, 3);",
             output: "function foo(_a, b, _c){console.log(b);}; foo(1, 2, 3);",
             parserOptions: { ecmaVersion: 2018 },
@@ -325,19 +384,19 @@ ruleTester.run("no-unused-vars", rule, {
         },
         {
             code: "let {a} = b",
-            output: "",
+            output: "let {} = b",
             parserOptions: { ecmaVersion: 6 },
             errors: [{ type: "Identifier" }]
         },
         {
             code: "let {a,} = b",
-            output: "",
+            output: "let {} = b",
             parserOptions: { ecmaVersion: 6 },
             errors: [{ type: "Identifier" }]
         },
         {
             code: "let {a1: a2} = b",
-            output: "",
+            output: "let {} = b",
             parserOptions: { ecmaVersion: 6 },
             errors: [{ type: "Identifier" }]
         },

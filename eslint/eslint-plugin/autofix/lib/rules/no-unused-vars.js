@@ -1,7 +1,3 @@
-/**
- * @fileoverview Add fixer to rule no-unused-vars.
- * @author Pig Fang <g-plane@hotmail.com>
- */
 "use strict";
 
 const ruleComposer = require("eslint-rule-composer");
@@ -11,6 +7,7 @@ const { hasSideEffect } = require("../ast-utils");
 const rule = utils.getFixableRule(null, false);
 
 const commaFilter = { filter: token => token.value === "," };
+const FUNC_TYPE = ['FunctionDeclaration', 'FunctionExpression', 'ArrowFunctionExpression']
 
 /**
  * Process the raw options into a config object.
@@ -78,6 +75,10 @@ function getIgnoredArgPrefix(config) {
 
     return m[1];
 }
+// 判断target的range是否在limitNode的range中
+function inRange(target, limitNode) {
+    return target && limitNode && target.range[0] >= limitNode.range[0] && target.range[1] <= limitNode.range[1]
+}
 
 module.exports = ruleComposer.mapReports(
     rule,
@@ -123,8 +124,8 @@ module.exports = ruleComposer.mapReports(
 
                             if (
                                 parent.params.length === 1 &&
-                              !(tokenBefore && tokenBefore.value === "(") &&
-                              !(tokenAfter && tokenAfter.value === ")")
+                              !(tokenBefore && tokenBefore.value === "(" && inRange(tokenBefore, parent)) &&
+                              !(tokenAfter && tokenAfter.value === ")" && inRange(tokenAfter, parent))
                             ) {
                                 return [
                                     fixer.insertTextBefore(node, "("),
@@ -185,7 +186,7 @@ module.exports = ruleComposer.mapReports(
                     if (!grand) {
                         return null;
                     }
-
+                    // 删除导出函数表达式和导出箭头函数表达式：export const foo = function () {}; export const foo = () => {}
                     if (parent.init && ['FunctionExpression', 'ArrowFunctionExpression'].includes(parent.init.type)) {
                         if (grand.parent && grand.parent.type === 'ExportNamedDeclaration') {
                             return fixer.remove(grand.parent)
@@ -219,10 +220,16 @@ module.exports = ruleComposer.mapReports(
                     if (hasSideEffect(parent.right)) {
                         return null;
                     }
+                    if (grand && grand.parent.type === 'ObjectPattern') {
+                        const comma = sourceCode.getTokenAfter(parent, commaFilter);
+                        if (inRange(comma, grand.parent)) {
+                            return [fixer.remove(comma), fixer.remove(parent)]
+                        }
+                    }
                     return fixer.remove(parent);
                 case "RestElement":
                 case "Property":
-                    if (parent.type === 'RestElement' && grand.type === 'FunctionDeclaration') {
+                    if (parent.type === 'RestElement' && FUNC_TYPE.includes(grand.type)) {
                         if (grand.params.length === 1) {
                             return fixer.remove(parent)
                         }
@@ -237,14 +244,21 @@ module.exports = ruleComposer.mapReports(
                     }
 
                     if (grand.properties.length === 1) {
-                        // const identifierRemoval = fixer.remove(parent);
-                        // const comma = sourceCode.getLastToken(grand, commaFilter);
-
-                        // return comma ? [identifierRemoval, fixer.remove(comma)] : identifierRemoval;
-                        if (grand.parent.type === 'VariableDeclarator') {
-                            return fixer.remove(grand.parent.parent)
+                        if (FUNC_TYPE.includes(grand.parent.type) && grand.parent.params) {
+                            // 属性和函数参数都只有一个：const foo = ({ a }) => {} => const foo = () => {}
+                            if (grand.parent.params.length === 1) {
+                                return fixer.remove(grand)
+                            }
+                            // 属性只有一个，但参数有多个，并且解构语句在最后一个参数：`const foo = (a, {b}) => {console.log(a)}; foo();` => `const foo = (a ) => {console.log(a)}; foo();`
+                            if (grand.parent.params[grand.parent.params.length - 1] === grand) {
+                                return [fixer.remove(sourceCode.getTokenBefore(parent, commaFilter)), fixer.remove(grand)]
+                            }
                         }
-                        return fixer.remove(grand)
+
+                        const identifierRemoval = fixer.remove(parent);
+                        const comma = sourceCode.getLastToken(grand, commaFilter);
+
+                        return comma ? [identifierRemoval, fixer.remove(comma)] : identifierRemoval;
                     }
 
                     if (parent === grand.properties[grand.properties.length - 1]) {
