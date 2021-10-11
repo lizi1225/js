@@ -309,8 +309,8 @@ function isSelfReference(ref, nodes) {
     return false;
 }
 const MERGABLE_TYPES = new Set([
-    experimental_utils_1.AST_NODE_TYPES.TSInterfaceDeclaration,
-    experimental_utils_1.AST_NODE_TYPES.TSTypeAliasDeclaration,
+    // experimental_utils_1.AST_NODE_TYPES.TSInterfaceDeclaration,
+    // experimental_utils_1.AST_NODE_TYPES.TSTypeAliasDeclaration,
     experimental_utils_1.AST_NODE_TYPES.TSModuleDeclaration,
     experimental_utils_1.AST_NODE_TYPES.ClassDeclaration,
     // experimental_utils_1.AST_NODE_TYPES.FunctionDeclaration,

@@ -37,6 +37,9 @@
 ## 0.0.52
 - TSInterfaceDeclaration: 增加其删除逻辑
 
+## 0.0.53
+删除无用文件
+
 ## 删除可能出现副作用的情况
 - const {a} = b()
 - const {a = b()} = c

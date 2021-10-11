@@ -10,7 +10,7 @@ const { start } = require('../src')
     program.option(option.flags, option.description, option.default);
     return prev.concat(option.usage)
 }, [])
-program.name('zs')
+program.name('dc')
 program.usage('[options]')
 program.version(pkg.version)
 

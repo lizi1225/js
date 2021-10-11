@@ -63,13 +63,20 @@ exports.default = util.createRule({
                                 type: 'string',
                             },
                             // 添加传入字段
-                            filenameArr: [{
-                                type: 'object',
-                                properties: {
-                                    filename: 'string',
-                                    varsIgnorePattern: 'string',
+                            filenameArr: {
+                                type: 'array',
+                                items: {
+                                    type: 'object',
+                                    properties: {
+                                        filename: {
+                                            type: 'string'
+                                        },
+                                        varsIgnorePattern: {
+                                            type: 'string'
+                                        },
+                                    }
                                 }
-                            }],
+                            },
                         },
                         additionalProperties: false,
                     },

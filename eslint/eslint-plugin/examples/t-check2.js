@@ -3,7 +3,7 @@ const result = analyzeTsConfig('./tsconfig.json');
 const path = require('path')
 // const fs = require('fs')
 // const unExports = result.unExports
-console.log('res', JSON.stringify(result, null, 2))
+// console.log('res', JSON.stringify(result, null, 2))
 const unExports = result.files
 const filenameArr = Object.keys(unExports).map((filename) => {
   return {
@@ -59,7 +59,7 @@ const cli = new CLIEngine({
   extensions: ['.ts', 'tsx'],
 })
 // console.log(cli.getRules().get('deadvars/dead-vars'))
-const report = cli.executeOnFiles([path.resolve(__dirname, 'src', 'a')])
+const report = cli.executeOnFiles([path.resolve(__dirname, 'src', 'c')])
 console.log(JSON.stringify(report, null, 2))
 // const formatter = cli.getFormatter();
 // // report.results = formatter(report.results)

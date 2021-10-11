@@ -5,13 +5,9 @@
   "description": "autofix some errors reported by eslint rules.",
   "main": "./lib/index.js",
   "scripts": {
-    "test": "mocha \"tests/**/*no-unused-vars.js\"",
-    "generate-readme-table": "node tools/generate-readme-table.js",
-    "generate-release": "node-release-script",
-    "new": "node tools/new-rule.js"
+    "test": "mocha \"tests/**/*.js\""
   },
   "files": [
-    "LICENSE",
     "readme.md",
     "lib"
   ],
@@ -42,8 +38,8 @@
     "autofix"
   ],
   "license": "MIT",
-  "repository": "https://github.com/lizi1225/eslint-plugin",
-  "homepage": "https://github.com/lizi1225/eslint-plugin",
+  "repository": "",
+  "homepage": "",
   "engines": {
     "node": ">=8"
   }

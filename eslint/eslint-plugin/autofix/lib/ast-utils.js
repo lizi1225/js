@@ -1,6 +1,5 @@
 /**
  * @fileoverview Common utils for AST. (copied from eslint repo)
- * @author Gyandeep Singh
  */
 
 "use strict";
