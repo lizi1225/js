@@ -53,10 +53,12 @@
 // console.log(d)
 
 // var {a = 'c', b} = c;
-interface a {
-  name: 'string';
-}
-const b:a = {
-  name: 's'
-}
-console.log(b)
+// interface a {
+//   name: 'string';
+// }
+// const b:a = {
+//   name: 's'
+// }
+// console.log(b)
+
+

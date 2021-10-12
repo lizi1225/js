@@ -35,8 +35,11 @@
 - `const foo = test(a => {}); foo();` => `const foo = test(() => {}); foo();`
 
 ## 0.0.52
-- TSInterfaceDeclaration: 增加其删除逻辑
+- 增加`TSInterfaceDeclaration`类型的逻辑
 - 删除无用文件
+
+## 0.0.53
+- 增加`TSDeclareFunction`类型的删除
 
 
 ## 删除可能出现副作用的情况

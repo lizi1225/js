@@ -276,6 +276,7 @@ module.exports = ruleComposer.mapReports(
                 case "TSEnumDeclaration":
                 case "TSTypeAliasDeclaration":
                 case "TSInterfaceDeclaration":
+                case 'TSDeclareFunction':
                     if (grand && grand.type === 'ExportNamedDeclaration') {
                         return fixer.remove(grand)
                     }
