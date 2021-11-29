@@ -1,0 +1,25 @@
+{
+  "name": "eslint-plugin-deadvars",
+  "version": "1.0.31",
+  "description": "",
+  "main": "lib/index.js",
+  "directories": {
+    "doc": "docs",
+    "lib": "lib",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "lizi1225",
+  "license": "ISC",
+  "dependencies": {
+    "@typescript-eslint/experimental-utils": "^4.31.1",
+    "@typescript-eslint/scope-manager": "^4.31.1"
+  },
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "typescript": "^4.4.3"
+  }
+}
