@@ -12,7 +12,7 @@ class Scope {
      * @param {*} name 
      */
     add(variableName) {
-        this.names.push(variableName)
+        this.variableNames.push(variableName)
     }
     // 查找变量
     findDefiningScope(variableName) {
