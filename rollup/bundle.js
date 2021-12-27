@@ -1,4 +1,4 @@
-import { name, age } from './msg'
+const name = 'zs'
 function say() {
     console.log('hello', name)
 }
