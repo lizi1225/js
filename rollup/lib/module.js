@@ -52,7 +52,7 @@ class Module {
     expandAllStatements() {
         const allStatements = []
         this.ast.body.forEach((statement) => {
-            if (statement.type === 'ImportDeclaration') return
+            if (['ImportDeclaration', 'VariableDeclaration', 'FunctionDeclaration'].includes(statement.type)) return
             const statements = this.expandStatements(statement)
             allStatements.push(...statements)
         })
