@@ -1,8 +1,14 @@
+interface IA {
+  name: string;
+  age: number;
+}
+const aaa:string = '1'
+
 /**
  * say 你好
  * @param name 名字
  */
- function sayHi (name: string, age: number, a: boolean):string {
+ function sayHi (name: string, age: number, a: IA):string {
   console.log(`hi, ${name}`);
   return `hi, ${name}`;
 }
