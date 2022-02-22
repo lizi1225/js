@@ -11,7 +11,8 @@
 * 类测试
 */
 class Guang {
-  name: string; // name 属性
+  // name 属性
+  name: string;
   constructor(name: string) {
       this.name = name;
   }

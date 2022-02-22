@@ -1,8 +1,8 @@
-const { transformFromAstSync, transformFileSync } = require('@babel/core')
+const { transformFromAstSync } = require('@babel/core')
 const parser = require('@babel/parser')
 const path = require('path')
 const fs = require('fs')
-const AutoDocumentPlugin = require('./autoDocumentPlugin')
+const AutoDocumentPlugin = require('./plugins/autoDocumentPlugin')
 
 const sourceCode = fs.readFileSync( path.resolve(__dirname, 'sourceCode.ts'), 'utf-8')
 const ast = parser.parse(sourceCode, {
