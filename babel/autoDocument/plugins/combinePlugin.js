@@ -33,7 +33,7 @@ function extractExportDeclaration(nodePath, options, id) {
   const node = path.node
   if (options.magicString) {
     id = id || path.get('id').toString()
-    if (options.imported && !options.imported.includes(id)) return
+    if (options.imported && !options.imported.find(({ importedName }) => importedName === id)) return
     const source = options.magicString.snip(node.start, node.end)
     options.bundleString.addSource({
       content: source,
