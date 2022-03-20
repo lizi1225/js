@@ -1,0 +1,43 @@
+#! /usr/bin/env node
+
+// 1. 配置可执行命令 vue create 用commander实现
+const { program } = require('commander')
+const chalk = require('chalk')
+// 核心功能 1.创建项目 2.更改配置文件 3.ui界面 @vue/ui
+program
+    .command('create <app-name>')
+    .description('create a new project')
+    .option(`-f, --force`, 'overwrite target directory if it exists')
+    .action((name, cmd) => {
+        require('../lib/create')(name, cmd)
+    })
+
+program
+    .command('config [value]')
+    .description('inspect and modify the config')
+    .option('-g, --get <path>', 'get value from option')
+    .option('-s, --set <path> <value>')
+    .option('-d, --delete <path>', 'delete option from config')
+    .action((value, cmd) => {
+        console.log(value, cmd)
+    })
+
+program
+    .command('ui')
+    .description('start and open cold-cli UI')
+    .option('-p, --port <port>', 'Port used from the UI server')
+    .action((cmd) => {
+        console.log(cmd)
+    })
+
+program
+    .usage(`<command> [option]`)
+    .version(`cold-cli@${require('../package.json').version}`)
+
+program.on('--help', () => {
+    console.log()
+    console.log(`Run ${chalk.cyan(`cold-cli <command> --help`)} show details`)
+})
+
+
+program.parse(process.argv)
