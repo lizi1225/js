@@ -11,8 +11,10 @@ export default class Base {
         this.cb = cb
     }
     transitionTo(location, callback) {
+        debugger
         // 根据路径进行匹配
         const record = this.router.match(location)
+        console.log('record', record)
         
 
         this.current = createRoute(record, { path: location })

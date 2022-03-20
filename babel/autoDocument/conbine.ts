@@ -1,6 +1,13 @@
-import { IA, T1 } from './interface'
-import { C } from './interface1'
-import { FF } from './interface3'
+interface B {
+  name: string;
+  age: number;
+}
+interface IA {
+  name: string;
+  age: number;
+  gender: B;
+}
+import { IA } from './interface'
 
 /**
  * say 你好

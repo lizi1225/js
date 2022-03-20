@@ -19,7 +19,8 @@ babel插件 -> 支持ts -> Nodejs工具
 
 4. 难点
 - 要不要处理import导入的文件，ts的接口、类型需要处理，但处理了可能会将一些不必要的方法和类的信息处理进来，又由于api各个文件可能有依赖关系，也可能没有依赖关系，所以可能会重复处理。
-  - babel默认只会处理单个文件，不会处理通过import导入的文件。可以通过babel/parser分析import输入的文件，判断是TSTypeAliasDeclaration和TSInterfaceDeclaration就把内容拿进来，通过Magic-string进行拼接
+  - babel默认只会处理单个文件，不会处理通过import导入的文件。可以通过babel/parser分析import输入的文件，判断是TSTypeAliasDeclaration和TSInterfaceDeclaration就把内容拿进来，通过Magic-string进行拼接，如果当前的TSTypeAliasDeclaration和TSInterfaceDeclaration又依赖了其它的接口和类型，就要进行递归解析了。
+  - 问题：1.字符串会重复拼接，比如入口引用了a文件中的aa接口，a文件引用了b文件中的bb接口，
 
 5. 扩展
 - 公共API语法检查，书写不合法则报错（API自动生成文档工具报错不明显）
