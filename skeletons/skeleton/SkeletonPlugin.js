@@ -1,5 +1,7 @@
 const Server = require("./Server")
 const Skeleton = require('./Skeleton')
+const fs = require('fs')
+const path = require('path')
 
 const PLUGIN_NAME = 'SkeletonPlugin'
 class SkeletonPlugin {
@@ -16,9 +18,13 @@ class SkeletonPlugin {
             // 生成骨架屏的html和style
             const skeletonHTML = await this.skeleton.genHTML(this.options.origin)
             console.log('skeletonHTML', skeletonHTML)
+            const originPath = path.resolve(this.options.staticDir, 'index.html')
+            const originHTML = await fs.readFileSync(originPath, 'utf-8')
+            const finalHTML = originHTML.replace('<!-- shell-->', skeletonHTML)
+            await fs.writeFileSync(originPath, finalHTML)
             // 销毁无头浏览器
             await this.skeleton.destroy()
-            // await this.server.close()
+            await this.server.close()
         })
     }
     async startServer() {

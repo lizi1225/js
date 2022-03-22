@@ -30,12 +30,20 @@ module.exports = {
     plugins: [
         new HTMLWebpackPlugin({
             template: './src/index.html',
+            inject: 'body',
         }),
         new SkeletonPlugin({
             staticDir: path.resolve(__dirname, 'dist'),
             port: 8000,
             origin: 'http://localhost:8000',
-            device: 'iPhone 6'
+            device: 'iPhone 6',
+            defer: 5000,
+            button: {
+                color: '#EFEFEF',
+            },
+            image: {
+                color: '#EFEFEF',
+            },
         })
     ]
 }
