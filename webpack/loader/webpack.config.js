@@ -13,6 +13,10 @@ module.exports = {
         test: /\.js$/,
         use: ['babel-loader']
       },
+      {
+        test: /\.js$/,
+        use: ['normal1-loader']
+      },
       // {
       //   test: /\.(png|jpg|gif|)$/,
       //   loader: 'file-loader',
@@ -21,16 +25,16 @@ module.exports = {
       //     esModule: false,
       //   }
       // },
-      {
-        test: /\.(png|jpg|gif|)$/,
-        loader: 'url-loader',
-        options: {
-          name: '[hash:8].[ext]',
-          // esModule: false,
-          limit: 8 * 1024,
-          fallback: path.resolve(__dirname, './loaders/file-loader.js')
-        }
-      }
+      // {
+      //   test: /\.(png|jpg|gif|)$/,
+      //   loader: 'url-loader',
+      //   options: {
+      //     name: '[hash:8].[ext]',
+      //     // esModule: false,
+      //     limit: 8 * 1024,
+      //     fallback: path.resolve(__dirname, './loaders/file-loader.js')
+      //   }
+      // }
     ]
   },
   plugins: [
