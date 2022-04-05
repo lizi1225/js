@@ -2,9 +2,11 @@ const express = require('express')
 const http = require('http')
 const updateCompiler = require('./utils/updateCompiler')
 const webpackDevMiddleware = require('../../webpack-dev-middleware')
+const io = require('socket.io')
 
 class Server {
     constructor(compiler, devServerArgs) {
+        this.sockets = []
         this.compiler = compiler
         this.devServerArgs = devServerArgs
         updateCompiler(compiler)
@@ -14,6 +16,25 @@ class Server {
         this.routes()
         this.setupDevMiddleware()
         this.createServer()
+        this.createSocketServer()
+    }
+    createSocketServer() {
+        // websocket通信之前要握手，握手用http协议
+        const websocketServer = io(this.server)
+        websocketServer.on('connection', (socket) => {
+            console.log('新的websocket连接')
+            // 保存socket 将来可以广播
+            this.sockets.push(socket)
+            socket.on('disconnect', () => {
+                const index = this.sockets.indexOf(socket)
+                this.sockets.splice(index, 1)
+            })
+            // 如果已经编译过了，发送消息
+            if (this._stats) {
+                socket.emit('hash', this._stats.hash)
+                socket.emit('ok')
+            }
+        })
     }
     setupDevMiddleware() {
         this.middleware = webpackDevMiddleware(this.compiler)
@@ -23,6 +44,10 @@ class Server {
         // stats编译成功后的成果描述（modules,chunks,files,assets,entries）
         this.compiler.hooks.done.tap('webpack-dev-server', (stats) => {
             console.log('stats.hash', stats.hash)
+            this.sockets.forEach(socket => {
+                socket.emit('hash', stats.hash)
+                socket.emit('ok')
+            })
             this._stats = stats
         })
     }

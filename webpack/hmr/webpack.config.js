@@ -4,7 +4,12 @@ const HotModuleReplacementPlugin = require('webpack/lib/HotModuleReplacementPlug
 
 module.exports = {
     mode: 'development',
-    entry: './src/index.js',
+    // entry: './src/index.js',
+    entry: [
+        // path.resolve('./webpack-dev-server/client/index.js'),
+        // path.resolve('./webpack/hot/dev-server.js'),
+        './src/index.js'
+    ],
     devtool: false,
     output: {
         path: path.resolve(__dirname, 'dist'),
@@ -13,7 +18,8 @@ module.exports = {
     },
     devServer: {
         port: 9000,
-        contentBase: path.resolve(__dirname, 'static'),
+        hot: true,
+        // contentBase: path.resolve(__dirname, 'static'),
     },
     plugins: [
         new HtmlWebpackPlugin({

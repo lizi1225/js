@@ -5,29 +5,27 @@
 /*!**********************!*\
   !*** ./src/index.js ***!
   \**********************/
-/***/ (() => {
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-
-
-/***/ }),
-
-/***/ "./webpack-dev-server/client/index.js":
-/*!********************************************!*\
-  !*** ./webpack-dev-server/client/index.js ***!
-  \********************************************/
-/***/ (() => {
-
-console.log('webpack-dev-server/client/index.js')
+const render = () => {
+    const title = __webpack_require__(/*! ./title */ "./src/title.js")
+    document.getElementById('root').innerText = title
+}
+render()
+if (true) {
+    debugger
+    module.hot.accept([/*! ./title.js */ "./src/title.js"], render)
+}
 
 /***/ }),
 
-/***/ "./webpack/hot/dev-server.js":
-/*!***********************************!*\
-  !*** ./webpack/hot/dev-server.js ***!
-  \***********************************/
-/***/ (() => {
+/***/ "./src/title.js":
+/*!**********************!*\
+  !*** ./src/title.js ***!
+  \**********************/
+/***/ ((module) => {
 
-console.log('webpack/hot/dev-server.js')
+module.exports = 'hello'
 
 /***/ })
 
@@ -92,7 +90,7 @@ console.log('webpack/hot/dev-server.js')
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	(() => {
-/******/ 		__webpack_require__.h = () => ("aa0b496f73a3a8930c0b")
+/******/ 		__webpack_require__.h = () => ("f66f66deff2a5ce02be5")
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/global */
@@ -1071,13 +1069,11 @@ console.log('webpack/hot/dev-server.js')
 /******/ 	})();
 /******/ 	
 /************************************************************************/
-/******/ 	
+/******/ 	debugger
 /******/ 	// module cache are used so entry inlining is disabled
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	__webpack_require__("./src/index.js");
-/******/ 	__webpack_require__("./webpack/hot/dev-server.js");
-/******/ 	var __webpack_exports__ = __webpack_require__("./webpack-dev-server/client/index.js");
+/******/ 	var __webpack_exports__ = __webpack_require__("./src/index.js");
 /******/ 	
 /******/ })()
 ;
