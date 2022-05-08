@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app"></div>
+    <script src="./reactivity.global.js"></script>
+
+    <script>
+        const { effect, reactive, computed } = VueReactivity
+        const state = reactive({ firstName: 'z', lastName: 's' })
+        const fullName = computed(() => {
+            console.log('computed')
+            return state.firstName + state.lastName
+        })
+        effect(() => { // 副作用函数 (effect执行渲染了页面)
+            app.innerHTML = fullName.value
+        });
+        setTimeout(() => {
+            state.firstName = 'p'
+        }, 1000)
+    </script>
+</body>
+</html>

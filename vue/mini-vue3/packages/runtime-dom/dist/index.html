@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=s, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app"></div>
+    <script src="./runtime-dom.global.js"></script>
+    <script>
+        const { createRenderer, h, render, Text } = VueRuntimeDOM
+        // render(h('h1',{style: {color:  'red'}, onClick: () => alert(1)}, [h('span', '123'), '123']), app)
+        render(h('h1', {style: {color: 'red'}}, [
+            h('li', {key: 'd'}, 'd'),
+            h('li', {key: 'a', style:{color:'yellow'}}, 'a'),
+            h('li', {key: 'b'}, 'b'),
+            h('li', {key: 'c'}, 'c'),
+        ]), app)
+        /**
+         * a b c
+         d a b c
+         i = 0
+         e1 = -1
+         e2 = 0
+         * */
+        setTimeout(() => {
+            // render(h('h1', {style: {color: 'green', background: 'red'}}, ['22', '33']), app)
+            render(h('h1', {style: {color: 'blue', background: 'red'}}, [
+                
+                h('li', {key: 'a'}, 'a'),
+                h('li', {key: 'b'}, 'b'),
+                h('li', {key: 'c'}, 'c'),
+        ]), app)
+        }, 1000)
+    </script>
+</body>
+</html>
