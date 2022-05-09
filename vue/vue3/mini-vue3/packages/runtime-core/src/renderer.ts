@@ -121,6 +121,38 @@ export function createRenderer(renderOptions) {
 
         // 优化完毕
         // 乱序比对
+        let s1 = i, s2 = i
+        const keyToNewIndexMap = new Map()
+        for(let i = s2; i <= e2; i++) {
+            keyToNewIndexMap.set(c2[i].key, i)
+        }
+
+        const toBePatched = e2 - s2 + 1
+        // 0是新增
+        const map = new Array(toBePatched).fill(0)
+        for(let i = s1; i <= e1; i++) {
+            const oldChild = c1[i]
+            const newIndex = keyToNewIndexMap.get(oldChild.key)
+            if (newIndex == undefined) {
+                unmount(oldChild)
+            } else {
+                map[newIndex - s2] = i + 1
+                patch(oldChild, c2[newIndex], el)
+            }
+        }
+        console.log(map)
+
+        for(let i = toBePatched - 1; i >= 0; i--) {
+            let index = i + s2
+            const current = c2[index]
+            const anchor = index + 1 < c2.length ? c2[index + 1].el : null
+            if (map[i] === 0) {
+                patch(null, current, el, anchor)
+            } else {
+                // 根据map用最长递增子序列进行优化 减少移动次数
+                hostInsert(current.el, el, anchor)
+            }
+        }
     }
 
     const patchChildren = (n1, n2, el) => {
