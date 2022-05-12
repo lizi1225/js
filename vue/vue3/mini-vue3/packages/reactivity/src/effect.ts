@@ -10,7 +10,7 @@ export class ReactiveEffect {
     public parent = null
     public deps = []
     public active = true
-    constructor(public fn, public scheduler) {
+    constructor(public fn, public scheduler?) {
     }
     run() {
         if (!this.active) {

@@ -1,5 +1,9 @@
-import { isString, ShapeFlags } from "@vue/shared"
-import { createVnode, isSameVnode, Text } from "./vnode"
+import { reactive, ReactiveEffect } from "@vue/reactivity"
+import { hasOwn, isString, ShapeFlags } from "@vue/shared"
+import { initProps } from "./componentProps"
+import { queueJob } from "./scheduler"
+import { getSequence } from "./sequence"
+import { createVnode, Fragment, isSameVnode, Text } from "./vnode"
 
 export function createRenderer(renderOptions) {
     const {
@@ -140,8 +144,8 @@ export function createRenderer(renderOptions) {
                 patch(oldChild, c2[newIndex], el)
             }
         }
-        console.log(map)
-
+        const increment = getSequence(map)
+        let j = increment.length - 1
         for(let i = toBePatched - 1; i >= 0; i--) {
             let index = i + s2
             const current = c2[index]
@@ -150,7 +154,12 @@ export function createRenderer(renderOptions) {
                 patch(null, current, el, anchor)
             } else {
                 // 根据map用最长递增子序列进行优化 减少移动次数
-                hostInsert(current.el, el, anchor)
+                if (i !== increment[j]) {
+                    hostInsert(current.el, el, anchor)
+                } else {
+                    j--
+                }
+                
             }
         }
     }
@@ -204,6 +213,86 @@ export function createRenderer(renderOptions) {
             patchElement(n1, n2)
         }
     }
+    const processFragment = (n1, n2, container) => {
+        if (n1 == null) {
+            mountChildren(n2.children, container)
+        } else {
+            patchChildren(n1, n2, container)
+        }
+    }
+    const publicPropertyMap = {
+        $attrs: (i) => i.attrs
+    }
+    const mountComponent = (vnode, container, anchor) => {
+        const { data = (() => {}), render, props: propsOptions = {} } = vnode.type
+        const state = reactive(data())
+
+        const instance = {
+            state,
+            // 组件的虚拟节点
+            vnode,
+            // 组件的渲染内容
+            subTree: null,
+            isMounted: false,
+            update: null,
+            propsOptions,
+            props: {},
+            attrs: {},
+            proxy: null,
+        }
+        initProps(instance, vnode.props)
+
+        instance.proxy = new Proxy(instance, {
+            get(target, key) {
+                const { state, props } = target
+                if (state && hasOwn(state, key)) {
+                    return state[key]
+                } else if (props && hasOwn(props, key)) {
+                    return props[key]
+                }
+                const getter = publicPropertyMap[key]
+                if (getter) {
+                    return getter(target)
+                }
+            },
+            set(target, key, value) {
+                const { state, props } = target
+                if (state && hasOwn(state, key)) {
+                    state[key] = value
+                    return true
+                } else if (props && hasOwn(props, key)) {
+                    console.warn(`attempting to mutate prop`)
+                    return false
+                }
+                return true
+            }
+        })
+
+        const componentUpdateFn = () => {
+            if (!instance.isMounted) {
+                // 初始化
+                const subTree = instance.subTree = render.call(instance.proxy)
+                patch(null, subTree, container, anchor)
+                instance.isMounted = true
+            } else {
+                // 更新
+                const subTree = render.call(instance.proxy)
+                patch(instance.subTree, subTree, container, anchor)
+                instance.subTree = subTree
+            }
+        }
+
+        const effect = new ReactiveEffect(componentUpdateFn, () => queueJob(instance.update))
+        // 调用update强制重新渲染
+        const update = instance.update = effect.run.bind(effect)
+        update()
+    }
+
+    const processComponent = (n1, n2, container, anchor) => {
+        if (n1 == null) {
+            mountComponent(n2, container, anchor)
+        }
+    }
 
     const patch = (n1, n2, container, anchor = null) => {
         if (n1 === n2) return
@@ -217,11 +306,15 @@ export function createRenderer(renderOptions) {
             case Text:
                 processText(n1, n2, container)
                 break;
-        
+            case Fragment:
+                processFragment(n1, n2, container)
+                break
             default:
                 if (shapeFlag & ShapeFlags.ELEMENT) {
                     // 初次渲染/组件的初次渲染
                     processElement(n1, n2, container, anchor)
+                } else if (shapeFlag & ShapeFlags.COMPONENT) {
+                    processComponent(n1, n2, container, anchor)
                 }
                 break;
         }

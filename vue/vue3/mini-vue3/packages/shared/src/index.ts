@@ -5,6 +5,7 @@ export const isNumber = (target) => typeof target === 'number'
 export const isFunction = (target) => typeof target === 'function'
 export const isArray = Array.isArray
 export const assign = Object.assign
+export const hasOwn = (target, key) => Object.prototype.hasOwnProperty.call(target, key)  
 
 export const enum ShapeFlags { // vue3提供的形状标识
     ELEMENT = 1,

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=s, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app"></div>
+    <div class="cliptext"></div>
+    <script>
+    </script>
+    <script src="./runtime-dom.global.js"></script>
+    <script>
+        const { createRenderer, h, render, Text, Fragment } = VueRuntimeDOM
+        const VueComponent = {
+            props: {
+                address: String,
+                c: {},
+            },
+            render() {
+                console.log(this.$attrs)
+                return h('p', this.address + this.$attrs.a + this.$attrs.b + this.c.n )
+            }
+        }
+        render(h(VueComponent, { address: 'xxx', a: 1, b : 2, c: {n : 1} }), app)
+    </script>
+</body>
+</html>
