@@ -1,6 +1,7 @@
 import { reactive, ReactiveEffect } from "@vue/reactivity"
 import { hasOwn, isString, ShapeFlags } from "@vue/shared"
-import { initProps } from "./componentProps"
+import { createComponentInstance, setupComponent } from "./component"
+import { initProps, updateProps } from "./componentProps"
 import { queueJob } from "./scheduler"
 import { getSequence } from "./sequence"
 import { createVnode, Fragment, isSameVnode, Text } from "./vnode"
@@ -220,54 +221,19 @@ export function createRenderer(renderOptions) {
             patchChildren(n1, n2, container)
         }
     }
-    const publicPropertyMap = {
-        $attrs: (i) => i.attrs
-    }
+    
     const mountComponent = (vnode, container, anchor) => {
-        const { data = (() => {}), render, props: propsOptions = {} } = vnode.type
-        const state = reactive(data())
+        // 1.创建组件实例
+        const instance = vnode.component = createComponentInstance(vnode)
+        // 2.给实例上赋值
+        setupComponent(instance)
+        // 3.创建一个effect
+        setupRenderEffect(instance, container, anchor)
+        
 
-        const instance = {
-            state,
-            // 组件的虚拟节点
-            vnode,
-            // 组件的渲染内容
-            subTree: null,
-            isMounted: false,
-            update: null,
-            propsOptions,
-            props: {},
-            attrs: {},
-            proxy: null,
-        }
-        initProps(instance, vnode.props)
-
-        instance.proxy = new Proxy(instance, {
-            get(target, key) {
-                const { state, props } = target
-                if (state && hasOwn(state, key)) {
-                    return state[key]
-                } else if (props && hasOwn(props, key)) {
-                    return props[key]
-                }
-                const getter = publicPropertyMap[key]
-                if (getter) {
-                    return getter(target)
-                }
-            },
-            set(target, key, value) {
-                const { state, props } = target
-                if (state && hasOwn(state, key)) {
-                    state[key] = value
-                    return true
-                } else if (props && hasOwn(props, key)) {
-                    console.warn(`attempting to mutate prop`)
-                    return false
-                }
-                return true
-            }
-        })
-
+    }
+    const setupRenderEffect = (instance, container, anchor) => {
+        const { render } = instance
         const componentUpdateFn = () => {
             if (!instance.isMounted) {
                 // 初始化
@@ -287,10 +253,18 @@ export function createRenderer(renderOptions) {
         const update = instance.update = effect.run.bind(effect)
         update()
     }
+    const updateComponent = (n1, n2) => {
+        const instance = (n2.component = n1.component)
+        const { props: prevProps = {} } = n1
+        const { props: nextProps = {} } = n2
+        updateProps(instance, prevProps, nextProps)
+    }
 
     const processComponent = (n1, n2, container, anchor) => {
         if (n1 == null) {
             mountComponent(n2, container, anchor)
+        } else {
+            updateComponent(n1, n2)
         }
     }
 
