@@ -1,0 +1,16 @@
+{
+  "name": "viteuse",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "vite50"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "vite": "^3.2.4",
+    "vue": "^3.2.45"
+  }
+}

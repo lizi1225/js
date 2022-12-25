@@ -1,7 +1,7 @@
 import { reactive, ReactiveEffect } from "@vue/reactivity"
 import { hasOwn, isString, ShapeFlags } from "@vue/shared"
 import { createComponentInstance, setupComponent } from "./component"
-import { initProps, updateProps } from "./componentProps"
+import { hasPropsChanged, initProps, updateProps } from "./componentProps"
 import { queueJob } from "./scheduler"
 import { getSequence } from "./sequence"
 import { createVnode, Fragment, isSameVnode, Text } from "./vnode"
@@ -232,6 +232,11 @@ export function createRenderer(renderOptions) {
         
 
     }
+    const updateComponentPreRender = (instance, next) => {
+        instance.next = null
+        instance.vnode = next
+        updateProps(instance.props, next.props)
+    }
     const setupRenderEffect = (instance, container, anchor) => {
         const { render } = instance
         const componentUpdateFn = () => {
@@ -241,6 +246,10 @@ export function createRenderer(renderOptions) {
                 patch(null, subTree, container, anchor)
                 instance.isMounted = true
             } else {
+                const { next } = instance
+                if (next) {
+                    updateComponentPreRender(instance, next)
+                }
                 // 更新
                 const subTree = render.call(instance.proxy)
                 patch(instance.subTree, subTree, container, anchor)
@@ -253,11 +262,22 @@ export function createRenderer(renderOptions) {
         const update = instance.update = effect.run.bind(effect)
         update()
     }
+    const shouldUpdateComponent = (n1, n2) => {
+        const { props: prevProps = {}, children: prevChildren } = n1
+        const { props: nextProps = {}, children: nextChildren } = n2
+        if (prevProps === nextProps) return false
+        if (prevChildren || nextChildren) return true
+        return hasPropsChanged(prevProps, nextProps)
+    }
     const updateComponent = (n1, n2) => {
         const instance = (n2.component = n1.component)
-        const { props: prevProps = {} } = n1
-        const { props: nextProps = {} } = n2
-        updateProps(instance, prevProps, nextProps)
+        // const { props: prevProps = {} } = n1
+        // const { props: nextProps = {} } = n2
+        // updateProps(instance, prevProps, nextProps)
+        if (shouldUpdateComponent(n1, n2)) {
+            instance.next = n2
+            instance.update()
+        }
     }
 
     const processComponent = (n1, n2, container, anchor) => {
