@@ -12,7 +12,6 @@ async function createOptimizeDepsRun(config) {
     const metadata = {
         optimized: {}
     }
-    debugger
     for(const id in deps) {
         const entry = deps[id]
         const file = path.resolve(depsCacheDir, id + '.js')
