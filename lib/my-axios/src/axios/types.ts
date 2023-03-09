@@ -6,6 +6,7 @@ export interface AxiosRequestConfig {
     params?: Method,
     data?: Record<string, any>;
     headers?: Record<string, any>;
+    timeout: number;
 }
 
 export interface AxiosResponse<T = any> {

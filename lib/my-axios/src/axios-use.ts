@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from './axios';
+import axios, { AxiosResponse, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
 const baseURL = 'http://localhost:8080';
 export interface User {
     username: string;
@@ -20,3 +20,11 @@ axios({
 }).catch(function (error: any) {
     console.log(error);
 });
+
+axios.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+    return config
+})
+
+axios.interceptors.response.use(response => {
+    return response
+})
