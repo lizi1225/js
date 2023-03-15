@@ -2,11 +2,15 @@ type Method = 'get' | 'GET' | 'post' | 'POST' | 'delete' | 'DELETE' | 'put' | 'P
 
 export interface AxiosRequestConfig {
     url: string,
-    method?: 'get',
-    params?: Method,
+    method?: Method,
+    params?: any,
     data?: Record<string, any>;
     headers?: Record<string, any>;
-    timeout: number;
+    timeout?: number;
+}
+
+export interface AxiosInstance {
+    <T = any>(config: AxiosRequestConfig): Promise<T>;
 }
 
 export interface AxiosResponse<T = any> {

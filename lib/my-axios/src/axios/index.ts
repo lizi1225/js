@@ -1,12 +1,12 @@
 import Axios from "./Axios";
-import {AxiosRequestConfig} from './types'
+import { AxiosRequestConfig, AxiosInstance } from './types'
 
-function createInstance() {
+function createInstance(): AxiosInstance {
     const context: Axios = new Axios()
 
     const instance = Axios.prototype.request.bind(context)
     Object.assign(instance, Axios.prototype, context);
-    return instance
+    return instance as AxiosInstance;
 }
 
 const axios = createInstance()

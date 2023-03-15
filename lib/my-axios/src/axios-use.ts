@@ -1,5 +1,5 @@
-import axios, { AxiosResponse, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
-const baseURL = 'http://localhost:8080';
+import axios, { AxiosResponse, AxiosRequestConfig } from './axios';
+const baseURL = 'http://localhost:3000';
 export interface User {
     username: string;
     password: string;
@@ -9,9 +9,12 @@ let user: User = {
     password: '123456'
 };
 axios({
-    method: 'get',
-    url: baseURL + '/get',
-    params: user
+    method: 'post',
+    url: baseURL + '/post',
+    params: user,
+    headers: {
+        'content-type': 'application/json',
+    },
 }).then((response: AxiosResponse) => {
     console.log(response);
     return response.data;
@@ -21,10 +24,10 @@ axios({
     console.log(error);
 });
 
-axios.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-    return config
-})
+// axios.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+//     return config
+// })
 
-axios.interceptors.response.use(response => {
-    return response
-})
+// axios.interceptors.response.use(response => {
+//     return response
+// })

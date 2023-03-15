@@ -18,7 +18,7 @@ class Axios {
     static create() {
         return new Axios()
     }
-    request<T>(config: AxiosRequestConfig): Promise<AxiosRequestConfig | AxiosResponse> {
+    request<T>(config: AxiosRequestConfig): Promise<AxiosRequestConfig | AxiosResponse<T>> {
         const chain: Interceptor[] = [{
             onFulfilled: this.dispatchRequest,
             onRejected: null
