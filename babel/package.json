@@ -22,5 +22,8 @@
     "@babel/types": "^7.16.0",
     "doctrine": "^3.0.0",
     "fs-extra": "^10.0.0"
+  },
+  "dependencies": {
+    "typescript": "^5.0.2"
   }
 }
