@@ -1,6 +1,4 @@
-class JSEmitter {
-    constructor() {
-    }
+class Generator {
     visitVariableDeclaration(node) {
         let str = '';
         str += node.kind + ' ';
@@ -115,4 +113,4 @@ class JSEmitter {
     }
 }
 
-module.exports = JSEmitter;
+module.exports = Generator;
