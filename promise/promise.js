@@ -4,43 +4,47 @@ const REJECTED = 'REJECTED'
 
 
 class Promise {
-    // 初始化Promise对象
     constructor(executor) {
-        // 初始化值为undefined
         this.value = undefined
-        // 初始化错误值为undefined
         this.reason = undefined
-        // 初始化状态为PENDING
         this.status = PENDING
-
-        // 初始化resolve函数
+        
+         // 定义两个数组峰分别存储 then 里面成功的回调和失败的回调
+        this.onResolvedCallbacks = [];
+        this.onRejectedCallbacks = [];
         const resolve = (value) => {
-            // 设置状态为FULFILLED
-            this.status = FULFILLED
-            // 设置值
-            this.value = value
+            if (this.status === PENDING) {
+                this.value = value
+                this.status = FULFILLED
+                this.onResolvedCallbacks.forEach(fn => fn())
+            }
         }
-        // 初始化reject函数
         const reject = (reason) => {
-            // 设置状态为REJECTED
-            this.reason = reason
-            // 设置原因
-            this.status = REJECTED
+            if (this.status === PENDING) {
+                this.reason = reason
+                this.status = REJECTED
+                this.onRejectedCallbacks.forEach(fn => fn())
+            }
         }
-        // 执行executor函数，并传入resolve和reject函数
+        // 默认执行executor函数，并传入resolve和reject函数
         executor(resolve, reject);
     }
     then(onFulfilled, onRejected) {
-        // 如果状态为FULFILLED，则调用onFulfilled函数，并传入this.value
        if (this.status === FULFILLED) {
         onFulfilled && onFulfilled(this.value)
        }
-       // 如果状态为REJECTED，则调用onRejected函数，并传入this.reason
        if (this.status === REJECTED) {
         onRejected && onRejected(this.reason)
+       }
+       if (this.status === PENDING) {
+        this.onResolvedCallbacks.push(() => {
+            onFulfilled(this.value)
+        })
+        this.onRejectedCallbacks.push(() => {
+            onRejected(this.reason)
+        })
        }
     }
 }
 
-// 导出Promise模块
 module.exports = Promise;

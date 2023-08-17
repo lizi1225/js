@@ -1,8 +1,9 @@
 const Promise = require('./promise.js');
 
 const p = new Promise((resolve, reject) => {
-    resolve(111);
-    // reject(11)
+   setTimeout(() => {
+    resolve(111)
+   }, 1000)
 })
 p.then((value) => {
     console.log('value', value)
